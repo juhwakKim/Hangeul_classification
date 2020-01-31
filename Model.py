@@ -7,6 +7,7 @@ from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.layers import LSTM
 from parameter import *
 K.set_learning_phase(0)
+import tensorflow as tf
 
 # # Loss and train functions, network architecture
 def ctc_lambda_func(args):
@@ -16,6 +17,14 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 2:, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
+def focal_ctc_lambda_func(args):
+    alpha=0.75
+    gamma=0.5
+    labels, y_pred, input_length, label_length = args
+    ctc_loss = K.ctc_batch_cost(labels, y_pred, input_length, label_length)
+    p = tf.exp(-ctc_loss)
+    focal_ctc_loss = alpha*tf.pow((1-p),gamma)*ctc_loss
+    return focal_ctc_loss
 
 def get_Model(training):
     input_shape = (img_w, img_h, 1)     # (128, 64, 1)
@@ -83,7 +92,8 @@ def get_Model(training):
 
     # Keras doesn't currently support loss funcs with extra parameters
     # so CTC loss is implemented in a lambda layer
-    loss_out = Lambda(ctc_lambda_func, output_shape=(1,), name='ctc')([y_pred, labels, input_length, label_length]) #(None, 1)
+
+    loss_out = Lambda(focal_ctc_lambda_func, output_shape=(1,), name='ctc')([labels, y_pred, input_length, label_length]) #(None, 1)
 
     if training:
         return Model(inputs=[inputs, labels, input_length, label_length], outputs=loss_out)

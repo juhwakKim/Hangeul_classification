@@ -12,12 +12,12 @@ K.set_learning_phase(0)
 
 model = get_Model(training=True)
 
-try:
-    model.load_weights('LSTM+BN5--27--23.855.hdf5')
-    print("...Previous weight data...")
-except:
-    print("...New weight data...")
-    pass
+# try:
+#     model.load_weights('LSTM+BN5--27--23.855.hdf5')
+#     print("...Previous weight data...")
+# except:
+#     print("...New weight data...")
+#     pass
 
 train_file_path = './DB/train/'
 tiger_train = TextImageGenerator(train_file_path, img_w, img_h, batch_size, downsample_factor)
