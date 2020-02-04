@@ -9,7 +9,7 @@ sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 from matplotlib import rc, font_manager
 
 import cv2
-from resnet import resnet_build
+# from resnet import resnet_build
 import keras
 from keras.models import Sequential
 from keras.layers import *
@@ -40,13 +40,14 @@ for folders in os.listdir('./char_data'):
     if(len(os.listdir('./char_data/{}'.format(folders))) == 1 or len(os.listdir('./char_data/{}'.format(folders))) == 0):
         print(folders)
     for files in os.listdir('./char_data/{}'.format(folders)):
+      if(files[0] != '.'):
         img = cv2.imread('./char_data/{}/'.format(folders) + files, cv2.IMREAD_GRAYSCALE)
-        img = cv2.resize(img, dsize=(32, 32), interpolation=cv2.INTER_AREA)
+        img = cv2.resize(img, dsize=(64, 64), interpolation=cv2.INTER_AREA)/255
         images_arr.append(img)
         labels_arr.append(int(folders,16))
-        
-images_arr = np.reshape(images_arr,(-1,32,32,1))
-images_arr = images_arr/255
+print(len(os.listdir('./char_data')))
+images_arr = np.reshape(images_arr,(-1,64,64,1))
+# images_arr = images_arr/255
 
 labels_arr = np.array(labels_arr)
 labels_arr_ = np.unique(labels_arr).reshape(-1,1)
@@ -55,18 +56,18 @@ labels_arr = labels_arr.reshape(-1,1)
 enc = OneHotEncoder()
 enc.fit(labels_arr_)
  
-num_classes = 2446
+num_classes = 2447
 batch_size = 128
 epochs = 50
 
 X_train, X_test, Y_train, Y_test = train_test_split(images_arr, labels_arr, test_size = 0.20, random_state = 42)
 
-Y_train = enc.transform(Y_train).toarray().reshape(-1,2446)
-Y_test = enc.transform(Y_test).toarray().reshape(-1,2446)
+Y_train = enc.transform(Y_train).toarray().reshape(-1,2447)
+Y_test = enc.transform(Y_test).toarray().reshape(-1,2447)
 
 # model = resnet_build.build(64,num_classes)
 model = Sequential()
-model.add(Conv2D(32, kernel_size=3, padding="valid",input_shape=(32, 32, 1)))
+model.add(Conv2D(32, kernel_size=3, padding="valid",input_shape=(64, 64, 1)))
 model.add(BatchNormalization())
 model.add(ReLU())
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
@@ -135,7 +136,7 @@ for i in list_[0:20]:
     if(j> 20):
       j = 20
     # train[i][0] is i-th image data with size 28x28
-    image = X_test[i].reshape(32, 32)   # not necessary to reshape if ndim is set to 2
+    image = X_test[i].reshape(64, 64)   # not necessary to reshape if ndim is set to 2
     plt.subplot(ROW, COLUMN, j)         # subplot with size (width 3, height 5)
     j +=1
     plt.imshow(image, cmap='gray')  # cmap='gray' is for black and white picture.

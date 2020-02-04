@@ -12,14 +12,14 @@ K.set_learning_phase(0)
 
 model = get_Model(training=True)
 
-# try:
-#     model.load_weights('LSTM+BN5--27--23.855.hdf5')
-#     print("...Previous weight data...")
-# except:
-#     print("...New weight data...")
-#     pass
+try:
+    model.load_weights('LSTM+BN5--01--33.762.hdf5')
+    print("...Previous weight data...")
+except:
+    print("...New weight data...")
+    pass
 
-train_file_path = './DB/train/'
+train_file_path = './DB'
 tiger_train = TextImageGenerator(train_file_path, img_w, img_h, batch_size, downsample_factor)
 tiger_train.build_data()
 
@@ -27,7 +27,7 @@ tiger_train.build_data()
 # tiger_val = TextImageGenerator(valid_file_path, img_w, img_h, val_batch_size, downsample_factor)
 # tiger_val.build_data()
 
-ada = tf.keras.optimizers.Adadelta()
+ada = tf.keras.optimizers.Adam()
 
 early_stop = EarlyStopping(monitor='loss', min_delta=0.001, patience=4, mode='min', verbose=1)
 checkpoint = ModelCheckpoint(filepath='LSTM+BN5--{epoch:02d}--{val_loss:.3f}.hdf5', monitor='loss', verbose=1, mode='min', period=1)

@@ -77,16 +77,7 @@ class TextImageGenerator:
 
 
         print(self.n, " Image Loading start...")
-        for i, img_file in enumerate(self.img_dir):
-            img = cv2.imread(self.img_dirpath + img_file, cv2.IMREAD_GRAYSCALE)
-            img = cv2.resize(img, (self.img_w, self.img_h))
-            img = img.astype(np.float32)
-            img = (img / 255.0) * 2.0 - 1.0
 
-            self.imgs[i, :, :] = img
-            self.texts.append(img_file[0:-4])
-        print(len(self.texts) == self.n)
-        print(self.n, " Image Loading finish...")
 
     def next_sample(self):      ## index max -> 0 으로 만들기
         self.cur_index += 1
@@ -125,9 +116,11 @@ class TextImageGenerator:
                 # print(chr(int(self.label_name_list[self.img_label_list_train[random_idx[2]][rand_3]],16)))
                 # cv2.waitKey(0)
                 img = cv2.resize(img,(64,128),interpolation=cv2.INTER_AREA)
+                img = img.astype(np.float32)
                 img = img.reshape(((128,64,1)))
+                
                 X_data[i] = img/255
-
+                
                 Y_data[i,:] = np.array([self.img_label_list_train[random_idx[0]][rand_1],self.img_label_list_train[random_idx[1]][rand_2],self.img_label_list_train[random_idx[2]][rand_3]])
                 # Y_data[i,:] = np.array([self.img_label_list_train[random_idx[0]][rand_1]])
                 label_length[i] = 3
@@ -171,7 +164,7 @@ class TextImageGenerator:
                     img[img_gap:img_.shape[0]+img_gap,w_:w_+img_.shape[1]] = img_
                     w_ += img_.shape[1]
                 img = cv2.resize(img,(64,128),interpolation=cv2.INTER_AREA)
-
+                img = img.astype(np.float32)
                 img = img.reshape(((128,64,1)))
                 X_data[i] = img/255
 
